@@ -18,11 +18,12 @@ function App() {
     const fetchCountries = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("https://restcountries.com/v3.1/all");
+ const response = await fetch("https://restcountries.com/v3.1/all?fields=name,cca3,flags,population,region");
         if (!response.ok) throw new Error("Erreur réseau");
         const data = await response.json();
         setCountries(data);
       } catch (err) {
+        console.error("L'erreur précise est :", err);
         setError("Impossible de charger les pays.");
       } finally {
         setIsLoading(false); // On arrête le chargement quoi qu'il arrive
