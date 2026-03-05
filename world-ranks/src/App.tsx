@@ -1,14 +1,14 @@
-import './App.css'
+ import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import CountryDetail from './pages/CountryDetail';
 
 function App() {
-
   return (
-    <>
-     <h1 className="text-5xl font-bold text-blue-600 bg-amber-200 p-4 rounded-xl shadow-lg">
-  Vite + React + Tailwind
-</h1>
-    </>
-  )
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/country/:id" element={<CountryDetail />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
