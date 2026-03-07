@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchAllCountries } from './api/countries';
-import { Country } from './types/country';
+import type { Country } from './types/country';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
