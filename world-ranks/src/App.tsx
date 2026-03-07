@@ -4,11 +4,9 @@ import Home from './pages/Home';
 import CountryDetail from './pages/CountryDetail';
 import Navbar from './components/Navbar';
 
-function App() {
-  // 2. Création de l'état pour le thème
+ function App() {
   const [isDark, setIsDark] = useState(false);
 
-  // 3. Effet pour ajouter/supprimer la classe 'dark' sur l'élément racine (html)
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add('dark');
@@ -18,8 +16,8 @@ function App() {
   }, [isDark]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-      {/* 4. On passe les vraies données à la Navbar */}
+    /* LIGNE DE TEST : Rouge en Light mode, Bleu en Dark mode */
+    <div className="min-h-screen bg-red-500 dark:bg-blue-500 transition-colors">
       <Navbar isDark={isDark} toggleDark={() => setIsDark(!isDark)} /> 
       
       <Routes>
