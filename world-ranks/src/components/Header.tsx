@@ -1,4 +1,8 @@
-const Header = ({ total }) => {
+interface HeaderProps {
+  total: number;
+}
+
+const Header = ({ total }: HeaderProps) => {
   return (
     <div className="p-4 border-b shadow-sm bg-gray-50">
       <div className="flex items-center justify-between">
