@@ -65,17 +65,9 @@ const App = () => {
 
   return (
     <div className="flex flex-col w-full h-screen bg-white">
-      <Header total={countries.length} />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          selectedRegions={selectedRegions}
-          onRegionChange={handleRegionChange}
-          statusFilters={statusFilters}
-          onStatusChange={handleStatusChange}
-        />
-        <MainContent countries={filteredCountries} />
-      </div>
-    </div>
+      <div className = "flex w-full h-1/3">{header}</div>
+      <div className='flex w-full h-3/2'>{sidebar}</div>
+     </div>
   );
 };
 
