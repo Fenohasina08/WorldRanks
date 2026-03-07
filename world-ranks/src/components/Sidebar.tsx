@@ -1,4 +1,14 @@
- const Sidebar = ({ selectedRegions, onRegionChange, statusFilters, onStatusChange }) => {
+interface SidebarProps {
+  selectedRegions: string[];
+  onRegionChange: (region: string) => void;
+  statusFilters: {
+    unMember: boolean;
+    independent: boolean;
+  };
+  onStatusChange: (type: 'unMember' | 'independent') => void;
+}
+
+const Sidebar = ({ selectedRegions, onRegionChange, statusFilters, onStatusChange }: SidebarProps) => {
   const regions = ['Americas', 'Antarctic', 'Asia', 'Africa', 'Europe', 'Oceania'];
 
   return (
