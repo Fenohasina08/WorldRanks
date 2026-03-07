@@ -14,4 +14,6 @@
   currencies?: { [key: string]: { name: string; symbol: string } };
   languages?: { [key: string]: string };
   borders?: string[]; // Codes des pays frontaliers
+  unMember?: boolean;
+  independent?: boolean;
 }
