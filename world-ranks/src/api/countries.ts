@@ -1,4 +1,4 @@
-import { Country } from '../types/country';
+import type { Country } from '../types/country';
 
 const BASE_URL = 'https://restcountries.com/v3.1';
 
