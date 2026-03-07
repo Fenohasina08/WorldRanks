@@ -1,23 +1,22 @@
 import { useState, useEffect } from 'react';
 import { fetchAllCountries } from './api/countries';
+import { Country } from './types/country';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 
 const App = () => {
-  const [countries, setCountries] = useState([]);
-  const [filteredCountries, setFilteredCountries] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [filteredCountries, setFilteredCountries] = useState<Country[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Filtres
-  const [selectedRegions, setSelectedRegions] = useState([]);
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [statusFilters, setStatusFilters] = useState({
     unMember: false,
     independent: false,
   });
 
-  // Chargement initial
   useEffect(() => {
     const loadCountries = async () => {
       try {
@@ -26,7 +25,7 @@ const App = () => {
         setCountries(data);
         setFilteredCountries(data);
       } catch (err) {
-        setError(err.message);
+        setError(err instanceof Error ? err.message : 'Erreur inconnue');
       } finally {
         setLoading(false);
       }
@@ -34,16 +33,13 @@ const App = () => {
     loadCountries();
   }, []);
 
-  // Appliquer les filtres à chaque changement
   useEffect(() => {
     let result = countries;
 
-    // Filtre par région
     if (selectedRegions.length > 0) {
       result = result.filter(c => selectedRegions.includes(c.region));
     }
 
-    // Filtre par statut
     if (statusFilters.unMember) {
       result = result.filter(c => c.unMember === true);
     }
@@ -54,16 +50,13 @@ const App = () => {
     setFilteredCountries(result);
   }, [countries, selectedRegions, statusFilters]);
 
-  // Gestionnaires
-  const handleRegionChange = (region) => {
+  const handleRegionChange = (region: string) => {
     setSelectedRegions(prev =>
-      prev.includes(region)
-        ? prev.filter(r => r !== region)
-        : [...prev, region]
+      prev.includes(region) ? prev.filter(r => r !== region) : [...prev, region]
     );
   };
 
-  const handleStatusChange = (type) => {
+  const handleStatusChange = (type: 'unMember' | 'independent') => {
     setStatusFilters(prev => ({ ...prev, [type]: !prev[type] }));
   };
 
