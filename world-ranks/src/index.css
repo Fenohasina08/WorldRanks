@@ -1,1 +1,9 @@
- @import "tailwindcss";
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+/* Optionnel : Assure-toi que les couleurs de base sont bien chargées */
+@theme {
+  --color-gray-50: #f9fafb;
+  --color-gray-900: #111827;
+}
