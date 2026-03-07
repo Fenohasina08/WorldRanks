@@ -1,6 +1,7 @@
  import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import type { Country } from '../types/country';
+import SkeletonCard from '../components/SkeletonCard';
 
 export default function Home() {
   const [countries, setCountries] = useState<Country[]>([]);
@@ -49,11 +50,23 @@ export default function Home() {
     }
   }, [filteredCountries, sortBy]);
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white transition-colors">
-      <div className="text-xl font-medium animate-pulse">Chargement... ⏳</div>
-    </div>
+ if (isLoading) {
+  return (
+    <main className="p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <div className="flex flex-col lg:flex-row gap-10">
+        <aside className="w-full lg:w-72 space-y-10 animate-pulse">
+           <div className="h-20 bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
+           <div className="h-20 bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
+        </aside>
+        <section className="flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        </section>
+      </div>
+    </main>
   );
+}
 
   return (
     <main className="p-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors">
