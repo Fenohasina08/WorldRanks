@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+ import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import type { Country } from '../types/country';
 
@@ -7,12 +7,9 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // États de filtrage
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"population" | "name">("population");
   const [selectedRegion, setSelectedRegion] = useState<string>("");
-  
-  // NOUVEAUX ÉTATS (Filtres de statut)
   const [isUNMember, setIsUNMember] = useState(false);
   const [isIndependent, setIsIndependent] = useState(false);
 
@@ -22,7 +19,6 @@ export default function Home() {
     const fetchCountries = async () => {
       try {
         setIsLoading(true);
-        // Note : On ajoute unMember et independent dans les fields !
         const response = await fetch("https://restcountries.com/v3.1/all?fields=name,cca3,flags,population,region,unMember,independent");
         if (!response.ok) throw new Error("Erreur réseau");
         const data = await response.json();
@@ -36,15 +32,11 @@ export default function Home() {
     fetchCountries();
   }, []);
 
-  // LOGIQUE DE FILTRAGE MISE À JOUR
   const filteredCountries = countries.filter((country) => {
     const matchesSearch = country.name.common.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRegion = selectedRegion === "" || country.region === selectedRegion;
-    
-    // Application de la règle du "Laissez-passer"
     const matchesUN = !isUNMember || country.unMember === true;
     const matchesIndep = !isIndependent || country.independent === true;
-
     return matchesSearch && matchesRegion && matchesUN && matchesIndep;
   });
 
@@ -57,20 +49,68 @@ export default function Home() {
     }
   }, [filteredCountries, sortBy]);
 
-  if (isLoading) return <div className="p-10 text-center dark:text-white">Chargement... ⏳</div>;
+  if (isLoading) return <div className="p-10 text-center dark:text-white dark:bg-gray-900 h-screen">Chargement... ⏳</div>;
 
   return (
     <main className="p-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors">
       <h1 className="text-3xl font-bold mb-8 text-center">World Ranks</h1>
       
+      {/* Affichage de l'erreur si elle existe */}
+      {error && <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-center">{error}</div>}
+
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="w-full md:w-64 space-y-8">
-          {/* ... Barre de recherche et Tri (inchangés) ... */}
+          
+          {/* 1. RECHERCHE */}
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-gray-500 uppercase">Search</label>
+            <input 
+              type="text"
+              placeholder="Name, Region..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full p-3 rounded-lg bg-gray-200 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
 
-          {/* SECTION STATUS (Nouveaux inputs) */}
+          {/* 2. TRI */}
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-gray-500 uppercase">Sort by</label>
+            <select 
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as "population" | "name")}
+              className="w-full p-3 rounded-lg bg-gray-200 dark:bg-gray-800 border-none outline-none cursor-pointer"
+            >
+              <option value="population">Population</option>
+              <option value="name">Name</option>
+            </select>
+          </div>
+
+          {/* 3. RÉGIONS */}
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-gray-500 uppercase">Region</label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedRegion("")}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${selectedRegion === "" ? "bg-gray-700 text-white" : "bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700"}`}
+              >
+                All
+              </button>
+              {regions.map(reg => (
+                <button
+                  key={reg}
+                  onClick={() => setSelectedRegion(reg)}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${selectedRegion === reg ? "bg-gray-700 text-white" : "bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700"}`}
+                >
+                  {reg}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 4. STATUS */}
           <div className="space-y-4">
             <h2 className="text-sm font-bold text-gray-500 uppercase">Status</h2>
-            
             <label className="flex items-center gap-3 cursor-pointer group">
               <input 
                 type="checkbox" 
@@ -94,7 +134,7 @@ export default function Home() {
         </aside>
 
         <section className="flex-1">
-          <p className="mb-4 text-gray-500">Found {sortedCountries.length} countries</p>
+          <p className="mb-4 text-gray-500 font-semibold italic">Found {sortedCountries.length} countries</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {sortedCountries.map((country) => (
               <Link to={`/country/${country.cca3}`} key={country.cca3}>
