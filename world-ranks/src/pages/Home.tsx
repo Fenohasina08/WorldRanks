@@ -2,7 +2,8 @@ import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import type { Country } from '../types/country';
 import SkeletonCard from '../components/SkeletonCard';
-import StatsBoard from '../components/StatsBoard'; // Assure-toi d'avoir créé ce composant
+import StatsBoard from '../components/StatsBoard';
+import Navbar from '../components/Navbar'; // Import de la Tâche 1
 
 interface HomeProps {
   favorites: string[];
@@ -70,15 +71,15 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
   // --- ÉCRAN DE CHARGEMENT ---
   if (isLoading) {
     return (
-      <main className="p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
-        <div className="flex flex-col lg:flex-row gap-10">
-          <aside className="w-full lg:w-72 space-y-10 animate-pulse">
-             <div className="h-10 bg-gray-200 dark:bg-gray-800 rounded-xl w-1/2"></div>
+      <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col gap-10 lg:flex-row">
+          <aside className="w-full space-y-10 lg:w-72 animate-pulse">
+             <div className="w-1/2 h-10 bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
              <div className="h-32 bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
              <div className="h-32 bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
           </aside>
           <section className="flex-1">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
             </div>
           </section>
@@ -88,10 +89,15 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
   }
 
   return (
-    <main className="p-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors">
-      <header className="mb-8">
-        <h1 className="text-4xl font-extrabold mb-2 text-center text-gray-900 dark:text-white tracking-tight">World Ranks</h1>
-        <p className="text-center text-gray-500 dark:text-gray-400 font-medium italic">
+    <main className="min-h-screen p-8 text-gray-800 transition-colors bg-gray-50 dark:bg-gray-900 dark:text-gray-100">
+      
+      {/* Tâche 1 : Navbar */}
+      <Navbar />
+
+      {/* Tâche 2 : En-tête Titre (Header Section) */}
+      <header className="mb-12 text-center">
+        <h1 className="mb-2 text-4xl font-black tracking-tight text-gray-900 dark:text-white">World Ranks</h1>
+        <p className="font-medium text-gray-500 dark:text-gray-400">
           Exploring {countries.length} nations across the globe
         </p>
       </header>
@@ -104,27 +110,31 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
       />
       
       {error && (
-        <div className="mb-8 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-center border border-red-200 dark:border-red-800">
+        <div className="p-4 mb-8 text-center text-red-700 bg-red-100 border border-red-200 rounded-lg dark:bg-red-900/30 dark:text-red-400 dark:border-red-800">
           {error}
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row gap-10">
+      <div className="flex flex-col gap-10 lg:flex-row">
         {/* BARRE LATÉRALE */}
-        <aside className="w-full lg:w-72 space-y-10">
+        <aside className="w-full space-y-10 lg:w-72">
+          {/* RECHERCHE */}
           <div className="space-y-3">
-            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Search</label>
-            <input 
-              type="text"
-              placeholder="Name, Region, Code..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-3 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 outline-none text-gray-900 dark:text-white transition-all shadow-sm"
-            />
+            <label className="text-xs font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">Search</label>
+            <div className="relative">
+              <input 
+                type="text"
+                placeholder="Name, Region, Code..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full p-3 text-gray-900 transition-all bg-white border-2 border-gray-100 shadow-sm outline-none rounded-xl dark:bg-gray-800 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 dark:text-white"
+              />
+            </div>
           </div>
 
+          {/* FILTRE FAVORIS */}
           <div className="space-y-3">
-            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Selection</label>
+            <label className="text-xs font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">Selection</label>
             <button
               onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
               className={`w-full p-3 rounded-xl text-sm font-bold transition-all border-2 flex items-center justify-center gap-2 ${
@@ -138,20 +148,22 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
             </button>
           </div>
 
+          {/* TRI */}
           <div className="space-y-3">
-            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Sort by</label>
+            <label className="text-xs font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">Sort by</label>
             <select 
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as "population" | "name")}
-              className="w-full p-3 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 outline-none cursor-pointer text-gray-900 dark:text-white shadow-sm"
+              className="w-full p-3 text-gray-900 bg-white border-2 border-gray-100 shadow-sm outline-none cursor-pointer rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:text-white"
             >
               <option value="population">Population</option>
               <option value="name">Name</option>
             </select>
           </div>
 
+          {/* RÉGIONS */}
           <div className="space-y-3">
-            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Region</label>
+            <label className="text-xs font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">Region</label>
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setSelectedRegion("")}
@@ -171,17 +183,18 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
             </div>
           </div>
 
+          {/* STATUS */}
           <div className="space-y-5">
-            <h2 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Status</h2>
+            <h2 className="text-xs font-bold tracking-widest text-gray-500 uppercase dark:text-gray-400">Status</h2>
             <div className="space-y-4">
               <label className="flex items-center gap-3 cursor-pointer group">
                 <input 
                   type="checkbox" 
                   checked={isUNMember}
                   onChange={(e) => setIsUNMember(e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 accent-blue-600 cursor-pointer"
+                  className="w-5 h-5 border-gray-300 rounded cursor-pointer dark:border-gray-600 accent-blue-600"
                 />
-                <span className="text-sm font-semibold group-hover:text-blue-500 transition-colors">UN Member</span>
+                <span className="text-sm font-semibold text-gray-700 transition-colors group-hover:text-blue-500 dark:text-gray-300">UN Member</span>
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer group">
@@ -189,17 +202,17 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
                   type="checkbox" 
                   checked={isIndependent}
                   onChange={(e) => setIsIndependent(e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 accent-blue-600 cursor-pointer"
+                  className="w-5 h-5 border-gray-300 rounded cursor-pointer dark:border-gray-600 accent-blue-600"
                 />
-                <span className="text-sm font-semibold group-hover:text-blue-500 transition-colors">Independent</span>
+                <span className="text-sm font-semibold text-gray-700 transition-colors group-hover:text-blue-500 dark:text-gray-300">Independent</span>
               </label>
             </div>
           </div>
         </aside>
 
-        {/* GRILLE DE CARTES AVEC ANIMATION */}
+        {/* GRILLE DE CARTES */}
         <section className="flex-1">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {filteredAndSortedCountries.map((country, index) => {
               const isFav = favorites.includes(country.cca3);
               return (
@@ -210,7 +223,7 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
                 >
                   <button 
                     onClick={() => toggleFavorite(country.cca3)}
-                    className={`absolute top-6 right-6 z-10 p-2.5 rounded-full shadow-lg transition-all transform hover:scale-125 active:scale-95 ${
+                    className={`absolute top-4 right-4 z-10 p-2.5 rounded-full shadow-lg transition-all transform hover:scale-125 active:scale-95 ${
                       isFav ? 'bg-red-500 text-white' : 'bg-white/90 dark:bg-gray-700/90 text-gray-400 hover:text-red-500'
                     }`}
                   >
@@ -219,25 +232,29 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
                     </svg>
                   </button>
 
-                  <Link to={`/country/${country.cca3}`} className="h-full flex flex-col">
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-blue-500 dark:group-hover:border-blue-400 group-hover:shadow-xl transition-all duration-300 h-full flex flex-col">
-                      <div className="relative overflow-hidden rounded-xl mb-4 h-40">
+                  <Link to={`/country/${country.cca3}`} className="flex flex-col h-full">
+                    <div className="flex flex-col h-full overflow-hidden transition-all duration-300 bg-white border border-gray-100 shadow-sm dark:bg-gray-800 rounded-2xl dark:border-gray-700 group-hover:border-blue-500 dark:group-hover:border-blue-400 group-hover:shadow-xl">
+                      <div className="relative h-40 overflow-hidden">
                         <img 
                           src={country.flags.svg} 
                           alt={country.name.common} 
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" 
                         />
                       </div>
-                      <h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                        {country.name.common}
-                      </h2>
-                      <div className="space-y-1 mt-auto">
-                        <p className="text-sm text-gray-500 dark:text-gray-400 flex justify-between">
-                          Region: <span className="font-semibold text-gray-800 dark:text-gray-200">{country.region}</span>
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 flex justify-between">
-                          Population: <span className="font-semibold text-gray-800 dark:text-gray-200">{country.population.toLocaleString()}</span>
-                        </p>
+                      <div className="flex flex-col flex-1 p-5">
+                        <h2 className="mb-4 text-lg font-bold text-gray-900 transition-colors dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                          {country.name.common}
+                        </h2>
+                        <div className="mt-auto space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-500 dark:text-gray-400">Region</span>
+                            <span className="font-semibold text-gray-800 dark:text-gray-200">{country.region}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-500 dark:text-gray-400">Population</span>
+                            <span className="font-semibold text-gray-800 dark:text-gray-200">{country.population.toLocaleString()}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </Link>
@@ -247,9 +264,9 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
           </div>
 
           {filteredAndSortedCountries.length === 0 && (
-            <div className="text-center py-20 animate-fade-in">
-              <p className="text-3xl mb-4">🏜️</p>
-              <p className="text-xl text-gray-500 dark:text-gray-400">No countries found.</p>
+            <div className="py-20 text-center animate-fade-in">
+              <p className="mb-4 text-3xl">🏜️</p>
+              <p className="text-xl text-gray-500 dark:text-gray-400">No countries found matching your criteria.</p>
             </div>
           )}
         </section>
