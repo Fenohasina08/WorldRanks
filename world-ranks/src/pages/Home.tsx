@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import type { Country } from '../types/country';
 import SkeletonCard from '../components/SkeletonCard';
+import StatsBoard from '../components/StatsBoard'; // Assure-toi d'avoir créé ce composant
 
 interface HomeProps {
   favorites: string[];
@@ -43,9 +44,8 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
     fetchCountries();
   }, []);
 
-  // --- LOGIQUE DE FILTRAGE ET TRI (Optimisée) ---
+  // --- LOGIQUE DE FILTRAGE ET TRI ---
   const filteredAndSortedCountries = useMemo(() => {
-    // 1. Filtrage
     const filtered = countries.filter((country) => {
       const matchesSearch = country.name.common.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesRegion = selectedRegion === "" || country.region === selectedRegion;
@@ -56,14 +56,16 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
       return matchesSearch && matchesRegion && matchesUN && matchesIndep && matchesFavorites;
     });
 
-    // 2. Tri
     return [...filtered].sort((a, b) => {
-      if (sortBy === "population") {
-        return b.population - a.population;
-      }
+      if (sortBy === "population") return b.population - a.population;
       return a.name.common.localeCompare(b.name.common);
     });
   }, [countries, searchQuery, selectedRegion, isUNMember, isIndependent, showOnlyFavorites, favorites, sortBy]);
+
+  // --- CALCUL DES STATS ---
+  const totalPopulation = useMemo(() => {
+    return filteredAndSortedCountries.reduce((acc, c) => acc + c.population, 0);
+  }, [filteredAndSortedCountries]);
 
   // --- ÉCRAN DE CHARGEMENT ---
   if (isLoading) {
@@ -85,15 +87,21 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
     );
   }
 
-  // --- AFFICHAGE PRINCIPAL ---
   return (
     <main className="p-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors">
-      <header className="mb-12">
-        <h1 className="text-4xl font-extrabold mb-2 text-center text-gray-900 dark:text-white">World Ranks</h1>
+      <header className="mb-8">
+        <h1 className="text-4xl font-extrabold mb-2 text-center text-gray-900 dark:text-white tracking-tight">World Ranks</h1>
         <p className="text-center text-gray-500 dark:text-gray-400 font-medium italic">
-          Found {filteredAndSortedCountries.length} countries
+          Exploring {countries.length} nations across the globe
         </p>
       </header>
+
+      {/* COMPOSANT DES STATS */}
+      <StatsBoard 
+        totalCountries={filteredAndSortedCountries.length}
+        totalPopulation={totalPopulation}
+        activeRegion={selectedRegion || "World"}
+      />
       
       {error && (
         <div className="mb-8 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-center border border-red-200 dark:border-red-800">
@@ -102,22 +110,19 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
       )}
 
       <div className="flex flex-col lg:flex-row gap-10">
-        {/* BARRE LATÉRALE (SIDEBAR) */}
+        {/* BARRE LATÉRALE */}
         <aside className="w-full lg:w-72 space-y-10">
-          
-          {/* RECHERCHE */}
           <div className="space-y-3">
             <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Search</label>
             <input 
               type="text"
-              placeholder="Name, Region..."
+              placeholder="Name, Region, Code..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-3 rounded-xl bg-gray-200 dark:bg-gray-800 border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-400 outline-none text-gray-900 dark:text-white transition-all shadow-sm"
+              className="w-full p-3 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 outline-none text-gray-900 dark:text-white transition-all shadow-sm"
             />
           </div>
 
-          {/* FILTRE FAVORIS */}
           <div className="space-y-3">
             <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Selection</label>
             <button
@@ -133,20 +138,18 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
             </button>
           </div>
 
-          {/* TRI */}
           <div className="space-y-3">
             <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Sort by</label>
             <select 
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as "population" | "name")}
-              className="w-full p-3 rounded-xl bg-gray-200 dark:bg-gray-800 border-2 border-transparent outline-none cursor-pointer text-gray-900 dark:text-white transition-all shadow-sm"
+              className="w-full p-3 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 outline-none cursor-pointer text-gray-900 dark:text-white shadow-sm"
             >
               <option value="population">Population</option>
               <option value="name">Name</option>
             </select>
           </div>
 
-          {/* RÉGIONS */}
           <div className="space-y-3">
             <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Region</label>
             <div className="flex flex-wrap gap-2">
@@ -168,7 +171,6 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
             </div>
           </div>
 
-          {/* STATUS */}
           <div className="space-y-5">
             <h2 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Status</h2>
             <div className="space-y-4">
@@ -179,7 +181,7 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
                   onChange={(e) => setIsUNMember(e.target.checked)}
                   className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 accent-blue-600 cursor-pointer"
                 />
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-blue-500 transition-colors">UN Member</span>
+                <span className="text-sm font-semibold group-hover:text-blue-500 transition-colors">UN Member</span>
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer group">
@@ -189,20 +191,23 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
                   onChange={(e) => setIsIndependent(e.target.checked)}
                   className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 accent-blue-600 cursor-pointer"
                 />
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-blue-500 transition-colors">Independent</span>
+                <span className="text-sm font-semibold group-hover:text-blue-500 transition-colors">Independent</span>
               </label>
             </div>
           </div>
         </aside>
 
-        {/* GRILLE DE CARTES */}
+        {/* GRILLE DE CARTES AVEC ANIMATION */}
         <section className="flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredAndSortedCountries.map((country) => {
+            {filteredAndSortedCountries.map((country, index) => {
               const isFav = favorites.includes(country.cca3);
               return (
-                <div key={country.cca3} className="relative group">
-                  {/* BOUTON FAVORIS (CŒUR) */}
+                <div 
+                  key={country.cca3} 
+                  className="relative group animate-fade-in"
+                  style={{ animationDelay: `${index * 40}ms` }}
+                >
                   <button 
                     onClick={() => toggleFavorite(country.cca3)}
                     className={`absolute top-6 right-6 z-10 p-2.5 rounded-full shadow-lg transition-all transform hover:scale-125 active:scale-95 ${
@@ -241,10 +246,10 @@ export default function Home({ favorites, toggleFavorite }: HomeProps) {
             })}
           </div>
 
-          {/* MESSAGE SI AUCUN RÉSULTAT */}
           {filteredAndSortedCountries.length === 0 && (
-            <div className="text-center py-20">
-              <p className="text-xl text-gray-500 dark:text-gray-400">No countries found matching your criteria. 🌎</p>
+            <div className="text-center py-20 animate-fade-in">
+              <p className="text-3xl mb-4">🏜️</p>
+              <p className="text-xl text-gray-500 dark:text-gray-400">No countries found.</p>
             </div>
           )}
         </section>
