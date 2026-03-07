@@ -1,14 +1,12 @@
-  const App = () => {
+const App = () => {
   return (
-    <div class = "w-full h-screen flex flex-col bg-amber-600">
-      <div class="w-full h-1/3 bg-green-300" >
-
-      </div>
-      <div class="w-full h-2/3 bg-blue-500">
-
+    <div className="flex flex-col w-full h-screen bg-amber-600">
+      <div className="w-full bg-green-300 h-1/3"></div>
+      <div className="flex items-center justify-center w-full bg-blue-500 h-2/3">
+        <div className="flex items-center justify-center h-[90%] w-[96%] bg-violet-700 
+        mb-[250px]"></div>
       </div>
     </div>
-
-    )
-}
+  );
+};
 export default App;
