@@ -1,4 +1,4 @@
- import { Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Home from './pages/Home';
 import CountryDetail from './pages/CountryDetail';
@@ -34,7 +34,7 @@ function App() {
 
   return (
     // On remet les couleurs grises ici 
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen transition-colors duration-300 bg-gray-50 dark:bg-gray-900">
       <Navbar isDark={isDark} toggleDark={() => setIsDark(!isDark)} /> 
       
       <Routes>
