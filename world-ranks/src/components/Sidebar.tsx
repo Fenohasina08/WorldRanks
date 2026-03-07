@@ -6,8 +6,9 @@ const Sidebar = () => {
                     <div className="flex w-1/2 bg-blue-100"></div>
                     <div className="flex w-1/2 bg-amber-900"></div>
                 </div>
-                <div className = 'w-[100%] h-[90.5%] bg-pink-300'>
-                
+                <div className = 'w-[100%] h-[90.5%] bg-pink-300 flex flex-row'>
+                    <div className="w-[25%] bg-yellow h-[100%]"></div>
+                    <div className="w-[75%] bg-amber-100"></div>
                 </div>
         </div>
      </div>
